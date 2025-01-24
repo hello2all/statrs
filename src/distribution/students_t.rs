@@ -1,5 +1,5 @@
 use crate::distribution::{Continuous, ContinuousCDF};
-use crate::function::{beta, gamma};
+use crate::function::{beta::{self, BetaFuncError}, gamma};
 use crate::statistics::*;
 use std::f64;
 
@@ -186,6 +186,21 @@ impl ContinuousCDF<f64, f64> for StudentsT {
                 ib
             } else {
                 1.0 - ib
+            }
+        }
+    }
+    
+    fn checked_cdf(&self, x: f64) -> Result<f64, BetaFuncError> {
+        if self.freedom.is_infinite() {
+            Ok(super::normal::cdf_unchecked(x, self.location, self.scale))
+        } else {
+            let k = (x - self.location) / self.scale;
+            let h = self.freedom / (self.freedom + k * k);
+            let ib = 0.5 * beta::checked_beta_reg(self.freedom / 2.0, 0.5, h)?;
+            if x <= self.location {
+                Ok(ib)
+            } else {
+                Ok(1.0 - ib)
             }
         }
     }

@@ -5,6 +5,7 @@ use super::statistics::{Max, Min};
 use ::num_traits::{Float, Num};
 use num_traits::NumAssignOps;
 
+pub use super::function::beta::BetaFuncError;
 pub use self::bernoulli::Bernoulli;
 pub use self::beta::{Beta, BetaError};
 pub use self::binomial::{Binomial, BinomialError};
@@ -107,6 +108,10 @@ pub trait ContinuousCDF<K: Float, T: Float>: Min<K> + Max<K> {
     /// assert_eq!(0.5, n.cdf(0.5));
     /// ```
     fn cdf(&self, x: K) -> T;
+
+    fn checked_cdf(&self, _x: K) -> Result<T, BetaFuncError> {
+        unimplemented!();
+    }
 
     /// Returns the survival function calculated
     /// at `x` for a given distribution. May panic depending
